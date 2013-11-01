@@ -1,0 +1,35 @@
+RESEARCH EVALUTION CODE -- NOT SAFE FOR PRODUCTION USE
+======================================
+
+This is the companion code to the research paper
+    "Ensuring High-Quality Randomness in Cryptographic Key Generation"
+by
+    Henry Corrigan-Gibbs (Stanford)
+    Wendy Mu (Stanford)
+    Dan Boneh (Stanford)
+    Bryan Ford (Yale)
+published in the ACM Conference on Computer and Communications Security 2013.
+
+The paper is available online for free here:
+    http://henrycg.com/pubs/ccs13ensuring/
+
+======================================
+
+This is research prototype code which we build for the sole purpose of testing
+out our new algorithm. This code is not well documented, not beautifully
+written, not easy to compile on different platforms (probably), and definitely
+not "secure" (for any definition of "secure").
+
+The code is here so that if you do want to implement our system properly,
+you have a good idea of where to start. If you would like to point out
+mistakes or potential areas of improvement, please feel free to email us.
+You can find our contact information online.
+
+======================================
+
+Running "make" should make three binaries.
+
+main      -  plays the role of the device generating keys
+ca_server - plays the role of the certificate authority
+ea_server - plays the role of the entropy authority
+

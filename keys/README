@@ -1,0 +1,4 @@
+These are just example keys to get you up
+and running with a test CA and EA. 
+If you were to run your own CA/EA, you must delete
+these keys and generate your own using OpenSSL.
