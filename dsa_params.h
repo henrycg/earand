@@ -60,7 +60,10 @@ bool DsaParams_EaVerify(const_DsaParams params, const unsigned char* sig, int si
 BIGNUM* DsaParams_RandomExponent(const_DsaParams params);
 EC_POINT* DsaParams_MultiplyG(const_DsaParams params, const BIGNUM* exp);
 EC_POINT* DsaParams_MultiplyH(const_DsaParams params, const BIGNUM* exp);
+EC_POINT* DsaParams_Multiply(const_DsaParams params, const EC_POINT* point, 
+    const BIGNUM* exp);
 EC_POINT* DsaParams_Add(const_DsaParams params, const EC_POINT* a, const EC_POINT* b);
+void DsaParams_Invert(const_DsaParams params, EC_POINT* a);
 
 EC_POINT* DsaParams_Commit(const_DsaParams params, const BIGNUM* v, const BIGNUM* r);
 

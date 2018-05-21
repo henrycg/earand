@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <openssl/err.h>
 
 #include "rsa_device.h"
 #include "dsa_device.h"
@@ -62,6 +63,10 @@ int main(int argc, char* argv[])
   puts("");
   X509_free(cert);
 
+  // Clean up OpenSSL junk
+  ERR_remove_state(0);
+  ERR_free_strings();
+  EVP_cleanup();
   CRYPTO_cleanup_all_ex_data();
 
   return EXIT_SUCCESS;

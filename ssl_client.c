@@ -126,6 +126,7 @@ bool MakeSSLRequest(const char* hostname, int port,
 
     SSL_CTX_free(ctx);
     ERR_free_strings();
+    ERR_remove_state(0);
     EVP_cleanup();
 
     return true;

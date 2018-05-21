@@ -6,7 +6,7 @@ LIBS = -lssl -lcrypto
 #CC = ~/ddwrt/toolchain-mipsel_gcc4.1.2/bin/mipsel-linux-uclibc-gcc
 #LIBS = -ldl libssl.a libcrypto.a 
 
-CFLAGS = -g -Wall -O1 -pedantic -std=gnu99 #-DDEBUG 
+CFLAGS = -g -Wall -O1 -pedantic -std=gnu99 -Wno-deprecated #-DDEBUG 
 LDFLAGS = $(CFLAGS) 
 TEST_SCRIPT = ./mkmutest
 
@@ -14,12 +14,12 @@ TEST_SCRIPT = ./mkmutest
 # Sources 
 
 HEADERS = bn_prime.h dsa_ca.h dsa_device.h dsa_ea.h dsa_params.h\
-            gen_keys.h integer_group.h product_proof.h\
+            gen_keys.h integer_group.h pedersen_proof.h product_proof.h\
             rsa_ca.h rsa_device.h rsa_ea.h rsa_params.h \
             ssl_client.h ssl_server.h util.h
 SOURCES = ca_server.c dsa_ca.c dsa_ea.c dsa_device.c \
             dsa_params.c ea_server.c gen_keys.c integer_group.c \
-						product_proof.c\
+						pedersen_proof.c product_proof.c\
 						main.c rsa_ca.c rsa_device.c rsa_ea.c rsa_params.c \
             ssl_client.c ssl_server.c util.c
 
@@ -28,12 +28,14 @@ SOURCES = ca_server.c dsa_ca.c dsa_ea.c dsa_device.c \
 
 TEST_MUTEST = mutest.h
 TEST_HEADERS = $(TEST_MUTEST) test_common.h
-TEST_SOURCES = mutest.c test_integer_group.c \
-	test_product_proof.c\
-	test_dsa_device.c\
+TEST_SOURCES = mutest.c \
+	test_pedersen_proof.c\
+  test_dsa_device.c\
+  test_product_proof.c\
 	test_dsa_params.c\
-	test_rsa_device.c\
-	test_rsa_params.c\
+  test_rsa_params.c\
+  test_rsa_device.c\
+  test_integer_group.c \
   test_util.c
 
 TARGET = main 

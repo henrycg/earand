@@ -16,6 +16,8 @@
 #include "mutest.h" /* MU_* constants, mu_print() */
 #include <stdio.h> /* printf(), fprintf() */
 #include <string.h> /* strncmp() */
+#include <openssl/err.h>
+#include <openssl/evp.h>
 
 /*
  * note that all global variables are public because they need to be accessed
@@ -72,6 +74,12 @@ int main(int argc, char* argv[]) {
 	parse_args(argc, argv);
 
 	mu_run_suites();
+
+  // Clean up OpenSSL junk
+  ERR_remove_state(0);
+  ERR_free_strings();
+  EVP_cleanup();
+  CRYPTO_cleanup_all_ex_data();
 
 	mu_print(MU_SUMMARY, "\n"
 			"Tests done:\n"

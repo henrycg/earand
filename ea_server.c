@@ -4,6 +4,7 @@
 
 #include "dsa_ea.h"
 #include "rsa_ea.h"
+#include "pedersen_proof.h"
 #include "ssl_server.h"
 #include "util.h"
 
@@ -113,12 +114,11 @@ void EaServer(SSL* ssl, void* data)
     CHECK_CALL(x_prime);
     CHECK_CALL(rand_x_prime);
 
-    CHECK_CALL(DsaEa_GetEntropyResponse(ea, commit_x, 
-          x_prime, rand_x_prime));
+    CHECK_CALL(DsaEa_SetEntropyRequest(ea, commit_x));
+    CHECK_CALL(DsaEa_GetEntropyResponse(ea, &x_prime));
 
-    // Send back x', x'_rand
+    // Send back x'
     CHECK_CALL(WriteOneBignum(STRING_X_PRIME, sizeof(STRING_X_PRIME), wfp, x_prime));
-    CHECK_CALL(WriteOneBignum(STRING_RAND_X_PRIME, sizeof(STRING_RAND_X_PRIME), wfp, rand_x_prime));
     
     CHECK_CALL(!fflush(wfp));
 
@@ -127,8 +127,10 @@ void EaServer(SSL* ssl, void* data)
     BN_clear_free(rand_x_prime);
 
     fprintf(stderr, "\tReading randomness request...\n");
+    // Read in proof
     BIGNUM* rand_a = BN_new();
-    CHECK_CALL(ReadOneBignum(&rand_a, rfp, STRING_RAND_A));
+    PedersenEvidence ev = PedersenEvidence_Unserialize(rfp);
+    CHECK_CALL(ev);
 
     // Read in signing request
     fprintf(stderr, "\tReading request...\n");
@@ -136,7 +138,7 @@ void EaServer(SSL* ssl, void* data)
     if(!req) {
       fatal("EA failed to read X509 request");
     }
-    CHECK_CALL(DsaEa_SetCertRequest(ea, rand_a, req));
+    CHECK_CALL(DsaEa_SetCertRequest(ea, ev, req));
     X509_REQ_free(req);
     BN_clear_free(rand_a);
 

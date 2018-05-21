@@ -1,3 +1,9 @@
+# Binaries
+main
+ea_server
+ca_server
+mutest
+
 # Object files
 *.o
 *.ko

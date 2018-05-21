@@ -40,6 +40,21 @@ struct ca_request_data {
 #define ASSERT(a) 
 #endif
 
+#ifdef DEBUG
+#define BN_DEBUG(t, a) do { printf("%s: ", t); BN_print_fp(stdout, a); printf("\n"); } while(0);
+#else  
+#define BN_DEBUG(t, a) 
+#endif
+
+#ifdef DEBUG
+#define EC_DEBUG(t, group, point, ctx) do { \
+  char* c = EC_POINT_point2hex(group, point, POINT_CONVERSION_UNCOMPRESSED, ctx);\
+  printf("%s: %s\n", t, c); \
+  free(c); } while(0);
+#else  
+#define EC_DEBUG(t, g, p, c) 
+#endif
+
 #define CHECK_CALL(a) do { \
    if(!(a)) { \
      fatal("File: %s, Line: %d, Function: %s\n",  __FILE__,  __LINE__, #a); \
@@ -62,8 +77,6 @@ struct ca_request_data {
 #define STRING_COMMIT_Y       "cy"
 #define STRING_X_PRIME        "xp"
 #define STRING_Y_PRIME        "yp"
-#define STRING_RAND_A         "ra"
-#define STRING_RAND_X_PRIME   "rxp"
 #define STRING_DELTA_X        "dx"
 #define STRING_DELTA_Y        "dy"
 #define STRING_MODULUS        "n"

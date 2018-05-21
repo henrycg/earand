@@ -31,14 +31,14 @@ struct dsa_params {
 
 void SetupCurve(DsaParams params, const char* curve_name)
 {
-  //const int nid = OBJ_txt2nid("secp224r1");
   const int nid = OBJ_txt2nid(curve_name);
   CHECK_CALL(nid > 0);
   CHECK_CALL(params->group = EC_GROUP_new_by_curve_name(nid));
   CHECK_CALL(params->ctx = BN_CTX_new());
 
-  CHECK_CALL(params->commit_g = EC_POINT_dup(
-        EC_GROUP_get0_generator(params->group), params->group));
+  const EC_POINT* gen = EC_GROUP_get0_generator(params->group);
+  CHECK_CALL(gen);
+  CHECK_CALL(params->commit_g = EC_POINT_dup(gen, params->group));
   CHECK_CALL(params->commit_h = EC_POINT_new(params->group));
 
   // For h value just pick some random constant point
@@ -329,33 +329,37 @@ unsigned char* DsaParams_PointToString(const_DsaParams params, const EC_POINT* p
 
 EC_POINT* DsaParams_MultiplyG(const_DsaParams params, const BIGNUM* exp)
 {
-  BIGNUM* zero = BN_new();
-  CHECK_CALL(zero);
-  BN_zero(zero);
-
-  EC_POINT* ret = DsaParams_Commit(params, exp, zero);
-  BN_free(zero);
-
-  return ret;
+  return DsaParams_Multiply(params, params->commit_g, exp);
 }
 
 EC_POINT* DsaParams_MultiplyH(const_DsaParams params, const BIGNUM* exp)
 {
-  BIGNUM* zero = BN_new();
-  CHECK_CALL(zero);
-  BN_zero(zero);
+  return DsaParams_Multiply(params, params->commit_h, exp);
+}
 
-  EC_POINT* ret = DsaParams_Commit(params, zero, exp);
-  BN_free(zero);
-
+EC_POINT* DsaParams_Multiply(const_DsaParams params, const EC_POINT* point, 
+    const BIGNUM* exp)
+{
+  EC_POINT* ret = EC_POINT_new(params->group);
+  CHECK_CALL(EC_POINT_mul(params->group, ret, NULL, point, exp, params->ctx));
   return ret;
 }
 
+void DsaParams_Invert(const_DsaParams params, EC_POINT* a)
+{
+  CHECK_CALL(EC_POINT_invert(params->group, a, params->ctx));
+}
 
 EC_POINT* DsaParams_Add(const_DsaParams params, const EC_POINT* a, const EC_POINT* b)
 {
   EC_POINT* res = EC_POINT_new(params->group);
   CHECK_CALL(res);
+  CHECK_CALL(a);
+  CHECK_CALL(b);
+  CHECK_CALL(params->ctx);
+  EC_DEBUG("a", params->group, a, params->ctx);
+  EC_DEBUG("b", params->group, b, params->ctx);
   CHECK_CALL(EC_POINT_add(params->group, res, a, b, params->ctx));
   return res;
 }
+

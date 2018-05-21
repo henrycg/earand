@@ -30,6 +30,8 @@
 #include "bn_prime.h"
 #include "util.h"
 
+#define BUF_LEN (1<<16)
+
 //--------------------------------------------------------------------------
 // malloc memory and abort on failure
 //--------------------------------------------------------------------------
@@ -85,8 +87,8 @@ int ReadOneBignum(BIGNUM **bn, FILE* file, const char *tag) {
   // First char after tag is ':'
   if(getc(file) != ':') return false;
 
-  const int buflen = 65535;
-  char buf[buflen+1];
+  const int buflen = BUF_LEN;
+  char buf[BUF_LEN+1];
 
   int ch, read = 0;
   while((ch = getc(file)) > 0 && read < buflen) {
@@ -118,8 +120,8 @@ int ReadOnePoint(EC_POINT **ec, EC_GROUP* g, FILE* file, const char *tag, BN_CTX
   // First char after tag is ':'
   if(getc(file) != ':') return false;
 
-  const int buflen = 65535;
-  char buf[buflen+1];
+  const int buflen = BUF_LEN;
+  char buf[BUF_LEN+1];
 
   int ch, read = 0;
   while((ch = getc(file)) > 0 && read < buflen) {
@@ -154,6 +156,8 @@ int WriteOnePoint(const char *tag, int tag_len, FILE* file,
   CHECK_CALL(hex);
   if(!fprintf(file, "%s", hex)) return false;
   if(!putc('\n', file)) return false;
+
+  OPENSSL_free(hex);
 
   return true;
 }
@@ -226,10 +230,13 @@ X509* RequestToCertificate(X509_REQ* req, EVP_PKEY* ca_key)
   CHECK_CALL(X509_gmtime_adj(cert->cert_info->validity->notAfter, 365*24*60*60));
 
   // Set the cert public key
-  CHECK_CALL(X509_set_pubkey(cert, X509_REQ_get_pubkey(req)));
+  EVP_PKEY* pk = X509_REQ_get_pubkey(req);
+  CHECK_CALL(X509_set_pubkey(cert, pk));
 
   // Sign cert with CA private key
   CHECK_CALL(X509_sign(cert, ca_key, EVP_sha1()));
+
+  EVP_PKEY_free(pk);
 
   return cert;
 }

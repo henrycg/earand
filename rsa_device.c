@@ -74,11 +74,11 @@ void RunEaSession(SSL* ssl, void* data)
   CHECK_CALL(RsaDevice_SetEntropyResponse(device, v1, v2));
 
   // Send proof to EA 
-  ProductEvidence ev;
-  CHECK_CALL(ev);
+  ProductEvidence ev = NULL;
   X509_REQ* req = X509_REQ_new();
   CHECK_CALL(req);
   CHECK_CALL(RsaDevice_GenEaSigningRequest(device, req, v1, v2, v3, &ev));
+  CHECK_CALL(ev);
 
   PrintTime("Sending cert to EA");
   CHECK_CALL(i2d_X509_REQ_fp(wfp, req));
